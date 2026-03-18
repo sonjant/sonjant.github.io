@@ -3,8 +3,213 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout>
-	<main>
-		<h1>Hi, I'm Sonja</h1>
-		<p>Personal site — more coming soon.</p>
+	<main class="home">
+		<h1>Sonja Ning Tang</h1>
+		<p class="tagline">
+			<span class="expand-trigger" data-for="exp-1">Modelling <sup>1</sup></span>, <span class="expand-trigger" data-for="exp-2">juggling <sup>2</sup></span>, and <span class="expand-trigger" data-for="exp-3">ex-footballing <sup>3</sup></span>
+		</p>
+
+		<!-- Sticky-note style overlays -->
+		<div id="exp-1" class="sticky-note" hidden>
+			<button type="button" class="sticky-note-close" aria-label="Close">×</button>
+			<span class="sticky-note-label">1</span>
+			<div class="sticky-note-body">
+				I model data, especially human genetic, metabolomic, proteomic, phenomic, and epidemiologic data. But I'm interested in data of all kinds, and lately I've also been learning more about financial data.
+			</div>
+		</div>
+		<div id="exp-2" class="sticky-note" hidden>
+			<button type="button" class="sticky-note-close" aria-label="Close">×</button>
+			<span class="sticky-note-label">2</span>
+			<div class="sticky-note-body">
+				I juggle AI agents to build fun things, and occasionally actual juggling balls too.
+			</div>
+		</div>
+		<div id="exp-3" class="sticky-note" hidden>
+			<button type="button" class="sticky-note-close" aria-label="Close">×</button>
+			<span class="sticky-note-label">3</span>
+			<div class="sticky-note-body">
+				Putting "ex-" anything in a tagline does feel a bit odd. But I once wanted to become a professional <span class="expand-trigger nested" data-for="exp-3-1">footballer <sup>1</sup></span>, until I tore my <span class="expand-trigger nested" data-for="exp-3-2">ACL <sup>2</sup></span> — not once, but twice. That changed the trajectory of my life, and is part of what drew me towards health and life sciences.
+			</div>
+		</div>
+		<div id="exp-3-1" class="sticky-note sticky-note--nested" hidden>
+			<button type="button" class="sticky-note-close" aria-label="Close">×</button>
+			<span class="sticky-note-label">1</span>
+			<div class="sticky-note-body">
+				My favourite players are Lionel Messi and Tobin Heath. My favourite match is the 2011 Women's World Cup final between Japan and the US.
+			</div>
+		</div>
+		<div id="exp-3-2" class="sticky-note sticky-note--nested" hidden>
+			<button type="button" class="sticky-note-close" aria-label="Close">×</button>
+			<span class="sticky-note-label">2</span>
+			<div class="sticky-note-body">
+				The anterior cruciate ligament (ACL), is one of the most commonly injured knee ligaments. ACL injuries are notably more common in girl's/women's sport than in boy's/men's, and the reasons are still not fully understood. It is an area that deserves much more research!!!
+			</div>
+		</div>
+
+		<div id="sticky-backdrop" class="sticky-backdrop" hidden aria-hidden="true"></div>
 	</main>
 </Layout>
+
+<script>
+	// @ts-nocheck
+	function openNote(id) {
+		const note = document.getElementById(id);
+		const backdrop = document.getElementById('sticky-backdrop');
+		if (note && backdrop) {
+			note.hidden = false;
+			backdrop.hidden = false;
+		}
+	}
+
+	function closeNote(id) {
+		const note = document.getElementById(id);
+		const backdrop = document.getElementById('sticky-backdrop');
+		if (note) note.hidden = true;
+		if (backdrop) backdrop.hidden = true;
+	}
+
+	function closeAllNotes() {
+		document.querySelectorAll('.sticky-note').forEach((el) => { el.setAttribute('hidden', ''); });
+		const backdrop = document.getElementById('sticky-backdrop');
+		if (backdrop) backdrop.hidden = true;
+	}
+
+	document.querySelectorAll('.expand-trigger').forEach((el) => {
+		el.addEventListener('click', (e) => {
+			e.preventDefault();
+			e.stopPropagation();
+			const id = el.getAttribute('data-for');
+			if (!id) return;
+			const box = document.getElementById(id);
+			if (!box) return;
+			if (box.hidden) {
+				closeAllNotes();
+				openNote(id);
+			} else {
+				closeNote(id);
+			}
+		});
+	});
+
+	document.querySelectorAll('.sticky-note-close').forEach((btn) => {
+		btn.addEventListener('click', () => closeAllNotes());
+	});
+
+	document.getElementById('sticky-backdrop')?.addEventListener('click', () => closeAllNotes());
+</script>
+
+<style>
+	.home {
+		padding: 1rem 1.5rem;
+		position: relative;
+	}
+
+	.tagline {
+		font-size: 1.125rem;
+		margin-top: 0.5rem;
+	}
+
+	.tagline .expand-trigger {
+		cursor: pointer;
+		color: inherit;
+	}
+
+	.tagline .expand-trigger sup {
+		color: #2563eb;
+		font-size: 0.7em;
+	}
+
+	.tagline .expand-trigger:hover,
+	.tagline .expand-trigger:hover sup {
+		color: #2563eb;
+	}
+
+	/* Backdrop: dim page when a note is open */
+	.sticky-backdrop {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.15);
+		z-index: 10;
+	}
+
+	/* Sticky note: post-it style overlay */
+	.sticky-note {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%) rotate(-0.5deg);
+		z-index: 20;
+		width: min(90vw, 22rem);
+		max-height: 80vh;
+		overflow: auto;
+		padding: 1.25rem 1.5rem 1.5rem;
+		background: #fef08a;
+		box-shadow:
+			2px 2px 0 rgba(0, 0, 0, 0.06),
+			4px 4px 0 rgba(0, 0, 0, 0.04),
+			8px 8px 16px rgba(0, 0, 0, 0.12);
+		border-radius: 2px;
+		border: 1px solid rgba(0, 0, 0, 0.06);
+	}
+
+	.sticky-note--nested {
+		background: #fef9c3;
+		transform: translate(-50%, -50%) rotate(0.8deg);
+		box-shadow:
+			2px 2px 0 rgba(0, 0, 0, 0.06),
+			6px 6px 12px rgba(0, 0, 0, 0.14);
+	}
+
+	.sticky-note-close {
+		position: absolute;
+		top: 0.5rem;
+		right: 0.5rem;
+		width: 2rem;
+		height: 2rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0;
+		font-size: 1.5rem;
+		line-height: 1;
+		color: #78716c;
+		background: none;
+		border: none;
+		cursor: pointer;
+		border-radius: 2px;
+	}
+
+	.sticky-note-close:hover {
+		color: #1c1917;
+		background: rgba(0, 0, 0, 0.06);
+	}
+
+	.sticky-note-label {
+		display: inline-block;
+		font-weight: 700;
+		color: #2563eb;
+		margin-bottom: 0.5rem;
+		font-size: 0.9rem;
+	}
+
+	.sticky-note-body {
+		line-height: 1.6;
+		color: #1c1917;
+		padding-right: 0.5rem;
+	}
+
+	.sticky-note-body .expand-trigger {
+		cursor: pointer;
+		color: inherit;
+	}
+
+	.sticky-note-body .expand-trigger sup {
+		color: #2563eb;
+		font-size: 0.7em;
+	}
+
+	.sticky-note-body .expand-trigger:hover,
+	.sticky-note-body .expand-trigger:hover sup {
+		color: #2563eb;
+	}
+</style>
