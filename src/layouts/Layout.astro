@@ -6,13 +6,15 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,7..72,200..800;1,7..72,200..800&display=swap" rel="stylesheet" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Sonja</title>
 	</head>
 	<body>
 		<slot />
+		<footer class="attribution">
+			DNA favicon derived from <a href="https://github.com/jdecked/twemoji" rel="noopener noreferrer">Twemoji</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener noreferrer">CC BY 4.0</a>.
+		</footer>
 	</body>
 </html>
 
@@ -21,8 +23,19 @@
 	body {
 		margin: 0;
 		width: 100%;
-		height: 100%;
+		min-height: 100%;
 		background-color: #EAF7F1;
 		font-family: 'Newsreader', Georgia, serif;
+	}
+
+	.attribution {
+		margin-top: 2rem;
+		padding: 1rem 1.5rem;
+		font-size: 0.75rem;
+		color: #6b7280;
+	}
+
+	.attribution a {
+		color: #4b5563;
 	}
 </style>
