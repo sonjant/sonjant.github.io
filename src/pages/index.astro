@@ -4,12 +4,18 @@ import Layout from '../layouts/Layout.astro';
 
 <Layout>
 	<main class="home">
-		<h1>Sonja Ning Tang (唐宁)</h1>
+		<h1>Servus, I&rsquo;m <span class="expand-trigger" data-for="exp-name">Sonja</span>.</h1>
 		<p class="tagline">
-			<span class="expand-trigger" data-for="exp-1">Modelling <sup>1</sup></span>, <span class="expand-trigger" data-for="exp-2">juggling <sup>2</sup></span>, and <span class="expand-trigger" data-for="exp-3">ex-footballing <sup>3</sup></span>
+			<span class="expand-trigger" data-for="exp-1">Modeling <sup>1</sup></span>, <span class="expand-trigger" data-for="exp-2">juggling <sup>2</sup></span>, and <span class="expand-trigger" data-for="exp-3">ex-footballing <sup>3</sup></span>.
 		</p>
 
 		<!-- Sticky-note style overlays -->
+		<div id="exp-name" class="sticky-note" hidden>
+			<button type="button" class="sticky-note-close" aria-label="Close">×</button>
+			<div class="sticky-note-body">
+				Sonja Ning Tang. My Chinese name is Táng Níng (唐宁).
+			</div>
+		</div>
 		<div id="exp-1" class="sticky-note" hidden>
 			<button type="button" class="sticky-note-close" aria-label="Close">×</button>
 			<span class="sticky-note-label">1</span>
@@ -52,11 +58,37 @@ import Layout from '../layouts/Layout.astro';
 
 <script>
 	// @ts-nocheck
-	function openNote(id) {
+	function positionNote(note, trigger) {
+		const margin = 16;
+		const gap = 12;
+		const triggerRect = trigger.getBoundingClientRect();
+
+		note.style.visibility = 'hidden';
+		note.hidden = false;
+
+		const noteRect = note.getBoundingClientRect();
+		const availableAbove = triggerRect.top - margin;
+		const availableBelow = window.innerHeight - triggerRect.bottom - margin;
+		const placeAbove = availableAbove >= noteRect.height || availableAbove > availableBelow;
+		const top = placeAbove
+			? Math.max(margin, triggerRect.top - noteRect.height - gap)
+			: Math.min(window.innerHeight - noteRect.height - margin, triggerRect.bottom + gap);
+		const centeredLeft = triggerRect.left + (triggerRect.width / 2) - (noteRect.width / 2);
+		const left = Math.min(
+			Math.max(margin, centeredLeft),
+			window.innerWidth - noteRect.width - margin
+		);
+
+		note.style.top = `${Math.max(margin, top)}px`;
+		note.style.left = `${left}px`;
+		note.style.visibility = '';
+	}
+
+	function openNote(id, trigger) {
 		const note = document.getElementById(id);
 		const backdrop = document.getElementById('sticky-backdrop');
 		if (note && backdrop) {
-			note.hidden = false;
+			positionNote(note, trigger);
 			backdrop.hidden = false;
 		}
 	}
@@ -84,7 +116,7 @@ import Layout from '../layouts/Layout.astro';
 			if (!box) return;
 			if (box.hidden) {
 				closeAllNotes();
-				openNote(id);
+				openNote(id, el);
 			} else {
 				closeNote(id);
 			}
@@ -109,18 +141,18 @@ import Layout from '../layouts/Layout.astro';
 		margin-top: 0.5rem;
 	}
 
-	.tagline .expand-trigger {
+	.expand-trigger {
 		cursor: pointer;
 		color: inherit;
 	}
 
-	.tagline .expand-trigger sup {
+	.expand-trigger sup {
 		color: #2563eb;
 		font-size: 0.7em;
 	}
 
-	.tagline .expand-trigger:hover,
-	.tagline .expand-trigger:hover sup {
+	.expand-trigger:hover,
+	.expand-trigger:hover sup {
 		color: #2563eb;
 	}
 
@@ -135,9 +167,9 @@ import Layout from '../layouts/Layout.astro';
 	/* Sticky note: post-it style overlay */
 	.sticky-note {
 		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%) rotate(-0.5deg);
+		top: 0;
+		left: 0;
+		transform: rotate(-0.5deg);
 		z-index: 20;
 		width: min(90vw, 22rem);
 		max-height: 80vh;
@@ -154,7 +186,7 @@ import Layout from '../layouts/Layout.astro';
 
 	.sticky-note--nested {
 		background: #fef9c3;
-		transform: translate(-50%, -50%) rotate(0.8deg);
+		transform: rotate(0.8deg);
 		box-shadow:
 			2px 2px 0 rgba(0, 0, 0, 0.06),
 			6px 6px 12px rgba(0, 0, 0, 0.14);
