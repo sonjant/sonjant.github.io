@@ -4,35 +4,36 @@ import Layout from '../layouts/Layout.astro';
 
 <Layout>
 	<main class="home">
-		<h1>Servus, I&rsquo;m <span class="expand-trigger" data-for="exp-name">Sonja</span>.</h1>
+		<h1>Servus, I&rsquo;m <span class="expand-trigger" data-for="exp-name">Sonja <sup>1</sup></span>.</h1>
 		<p class="tagline">
-			<span class="expand-trigger" data-for="exp-1">Modeling <sup>1</sup></span>, <span class="expand-trigger" data-for="exp-2">juggling <sup>2</sup></span>, and <span class="expand-trigger" data-for="exp-3">ex-footballing <sup>3</sup></span>.
+			<span class="expand-trigger" data-for="exp-1">Modeling <sup>2</sup></span>, <span class="expand-trigger" data-for="exp-2">juggling <sup>3</sup></span>, and <span class="expand-trigger" data-for="exp-3">ex-footballing <sup>4</sup></span>.
 		</p>
 
 		<!-- Sticky-note style overlays -->
 		<div id="exp-name" class="sticky-note" hidden>
 			<button type="button" class="sticky-note-close" aria-label="Close">×</button>
+			<span class="sticky-note-label">1</span>
 			<div class="sticky-note-body">
-				Sonja Ning Tang. My Chinese name is Táng Níng (唐宁).
+				Sonja Ning Tang. My Chinese name is 唐宁 (Táng Níng).
 			</div>
 		</div>
 		<div id="exp-1" class="sticky-note" hidden>
 			<button type="button" class="sticky-note-close" aria-label="Close">×</button>
-			<span class="sticky-note-label">1</span>
+			<span class="sticky-note-label">2</span>
 			<div class="sticky-note-body">
 				I model data, especially human genetic, metabolomic, proteomic, phenomic, and epidemiologic data. But I'm interested in data of all kinds, and lately I've also been learning more about financial data.
 			</div>
 		</div>
 		<div id="exp-2" class="sticky-note" hidden>
 			<button type="button" class="sticky-note-close" aria-label="Close">×</button>
-			<span class="sticky-note-label">2</span>
+			<span class="sticky-note-label">3</span>
 			<div class="sticky-note-body">
 				I juggle AI agents to build fun things, and occasionally actual juggling balls too.
 			</div>
 		</div>
 		<div id="exp-3" class="sticky-note" hidden>
 			<button type="button" class="sticky-note-close" aria-label="Close">×</button>
-			<span class="sticky-note-label">3</span>
+			<span class="sticky-note-label">4</span>
 			<div class="sticky-note-body">
 				Putting "ex-" anything in a tagline does feel a bit odd. But I once wanted to become a professional <span class="expand-trigger nested" data-for="exp-3-1">footballer <sup>1</sup></span>, until I tore my <span class="expand-trigger nested" data-for="exp-3-2">ACL <sup>2</sup></span> — not once, but twice. That changed the trajectory of my life, and is part of what drew me towards health and life sciences.
 			</div>
