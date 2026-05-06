@@ -4,9 +4,9 @@ import Layout from '../layouts/Layout.astro';
 
 <Layout>
 	<main class="home">
-		<h1>Servus, I&rsquo;m <span class="expand-trigger" data-for="exp-name">Sonja <sup>1</sup></span>.</h1>
+		<h1>Servus, I&rsquo;m <span class="expand-trigger" data-for="exp-name">Sonja<sup>1</sup></span>.</h1>
 		<p class="tagline">
-			<span class="expand-trigger" data-for="exp-1">Modeling <sup>2</sup></span>, <span class="expand-trigger" data-for="exp-2">juggling <sup>3</sup></span>, and <span class="expand-trigger" data-for="exp-3">ex-footballing <sup>4</sup></span>.
+			<span class="expand-trigger" data-for="exp-1">Modeling<sup>2</sup></span>, <span class="expand-trigger" data-for="exp-2">juggling<sup>3</sup></span>, and <span class="expand-trigger" data-for="exp-3">ex-footballing<sup>4</sup></span>.
 		</p>
 
 		<!-- Sticky-note style overlays -->
@@ -35,7 +35,7 @@ import Layout from '../layouts/Layout.astro';
 			<button type="button" class="sticky-note-close" aria-label="Close">×</button>
 			<span class="sticky-note-label">4</span>
 			<div class="sticky-note-body">
-				Putting "ex-" anything in a tagline does feel a bit odd. But I once wanted to become a professional <span class="expand-trigger nested" data-for="exp-3-1">footballer <sup>1</sup></span>, until I tore my <span class="expand-trigger nested" data-for="exp-3-2">ACL <sup>2</sup></span> — not once, but twice. That changed the trajectory of my life, and is part of what drew me towards health and life sciences.
+				Putting "ex-" anything in a tagline does feel a bit odd. But I once wanted to become a professional <span class="expand-trigger nested" data-for="exp-3-1">footballer<sup>1</sup></span>, until I tore my <span class="expand-trigger nested" data-for="exp-3-2">ACL<sup>2</sup></span> — not once, but twice. That changed the trajectory of my life, and is part of what drew me towards health and life sciences.
 			</div>
 		</div>
 		<div id="exp-3-1" class="sticky-note sticky-note--nested" hidden>
@@ -96,15 +96,23 @@ import Layout from '../layouts/Layout.astro';
 
 	function closeNote(id) {
 		const note = document.getElementById(id);
-		const backdrop = document.getElementById('sticky-backdrop');
 		if (note) note.hidden = true;
-		if (backdrop) backdrop.hidden = true;
+		updateBackdrop();
 	}
 
 	function closeAllNotes() {
 		document.querySelectorAll('.sticky-note').forEach((el) => { el.setAttribute('hidden', ''); });
 		const backdrop = document.getElementById('sticky-backdrop');
 		if (backdrop) backdrop.hidden = true;
+	}
+
+	function closeNestedNotes() {
+		document.querySelectorAll('.sticky-note--nested').forEach((el) => { el.setAttribute('hidden', ''); });
+	}
+
+	function updateBackdrop() {
+		const backdrop = document.getElementById('sticky-backdrop');
+		if (backdrop) backdrop.hidden = !document.querySelector('.sticky-note:not([hidden])');
 	}
 
 	document.querySelectorAll('.expand-trigger').forEach((el) => {
@@ -115,11 +123,20 @@ import Layout from '../layouts/Layout.astro';
 			if (!id) return;
 			const box = document.getElementById(id);
 			if (!box) return;
+			const isNestedTrigger = el.classList.contains('nested');
 			if (box.hidden) {
-				closeAllNotes();
+				if (isNestedTrigger) {
+					closeNestedNotes();
+				} else {
+					closeAllNotes();
+				}
 				openNote(id, el);
 			} else {
-				closeNote(id);
+				if (isNestedTrigger) {
+					closeNote(id);
+				} else {
+					closeAllNotes();
+				}
 			}
 		});
 	});
@@ -145,6 +162,7 @@ import Layout from '../layouts/Layout.astro';
 	.expand-trigger {
 		cursor: pointer;
 		color: inherit;
+		transition: color 160ms ease;
 	}
 
 	.expand-trigger sup {
@@ -153,7 +171,9 @@ import Layout from '../layouts/Layout.astro';
 	}
 
 	.expand-trigger:hover,
-	.expand-trigger:hover sup {
+	.expand-trigger:focus-visible,
+	.expand-trigger:hover sup,
+	.expand-trigger:focus-visible sup {
 		color: #228b22;
 	}
 
@@ -237,12 +257,14 @@ import Layout from '../layouts/Layout.astro';
 	}
 
 	.sticky-note-body .expand-trigger sup {
-		color: #2563eb;
+		color: #228b22;
 		font-size: 0.7em;
 	}
 
 	.sticky-note-body .expand-trigger:hover,
-	.sticky-note-body .expand-trigger:hover sup {
-		color: #2563eb;
+	.sticky-note-body .expand-trigger:focus-visible,
+	.sticky-note-body .expand-trigger:hover sup,
+	.sticky-note-body .expand-trigger:focus-visible sup {
+		color: #228b22;
 	}
 </style>
