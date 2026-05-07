@@ -8,6 +8,49 @@ import Layout from '../layouts/Layout.astro';
 		<p class="tagline">
 			<span class="expand-trigger" data-for="exp-1">Modeling<sup>2</sup></span>, <span class="expand-trigger" data-for="exp-2">juggling<sup>3</sup></span>, and <span class="expand-trigger" data-for="exp-3">ex-footballing<sup>4</sup></span>.
 		</p>
+		<nav class="link-boxes" aria-label="Site sections">
+			<button class="link-box" id="travel-toggle" type="button" aria-expanded="false" aria-controls="travel-map-panel">Travel</button>
+		</nav>
+		<section class="travel-map-panel" id="travel-map-panel" hidden>
+			<div class="travel-map-card">
+				<div class="travel-map-header">
+					<p class="travel-map-label">UNESCO World Heritage</p>
+					<p class="travel-map-count"><span id="heritage-count">0</span> visited</p>
+				</div>
+				<div class="world-map-frame">
+					<svg class="world-map" viewBox="0 0 1000 520" role="img" aria-labelledby="world-map-title world-map-desc">
+						<title id="world-map-title">Visited UNESCO World Heritage sites</title>
+						<desc id="world-map-desc">A world map with markers for visited UNESCO World Heritage sites.</desc>
+						<rect class="map-ocean" width="1000" height="520" rx="16"></rect>
+						<g class="map-grid" aria-hidden="true">
+							<path d="M166 28V492"></path>
+							<path d="M333 28V492"></path>
+							<path d="M500 28V492"></path>
+							<path d="M667 28V492"></path>
+							<path d="M834 28V492"></path>
+							<path d="M42 130H958"></path>
+							<path d="M42 260H958"></path>
+							<path d="M42 390H958"></path>
+						</g>
+						<g class="map-land" aria-hidden="true">
+							<path d="M112 154C148 99 240 85 313 122C336 143 323 172 348 198C318 233 267 219 231 257C204 292 152 277 129 247C99 229 91 184 112 154Z"></path>
+							<path d="M321 49C363 26 419 45 439 78C407 107 352 106 319 82C311 69 312 58 321 49Z"></path>
+							<path d="M291 286C330 305 351 345 340 387C332 429 310 471 284 493C251 462 248 410 263 371C276 340 251 310 291 286Z"></path>
+							<path d="M468 148C506 125 556 129 586 156C560 186 511 186 471 166C462 161 461 154 468 148Z"></path>
+							<path d="M519 211C586 216 631 267 620 332C609 400 568 456 535 431C501 390 485 311 500 251C505 231 510 218 519 211Z"></path>
+							<path d="M586 145C690 105 825 135 902 205C852 241 781 221 745 261C706 311 651 291 616 246C586 207 551 181 586 145Z"></path>
+							<path d="M760 365C811 345 870 361 890 400C849 431 785 425 752 395C743 383 746 372 760 365Z"></path>
+							<path d="M84 481C225 464 373 471 501 482C638 468 786 467 918 484C846 510 189 511 84 481Z"></path>
+							<ellipse cx="458" cy="142" rx="9" ry="14"></ellipse>
+							<ellipse cx="875" cy="242" rx="9" ry="20"></ellipse>
+							<ellipse cx="908" cy="436" rx="20" ry="9"></ellipse>
+						</g>
+						<g id="heritage-markers" class="heritage-markers"></g>
+					</svg>
+				</div>
+				<ol class="heritage-list" id="heritage-list"></ol>
+			</div>
+		</section>
 
 		<!-- Sticky-note style overlays -->
 		<div id="exp-name" class="sticky-note" hidden>
@@ -59,6 +102,78 @@ import Layout from '../layouts/Layout.astro';
 
 <script>
 	// @ts-nocheck
+	const visitedHeritageSites = [
+		// Add visited UNESCO sites here:
+		// { name: 'Site name', country: 'Country', lat: 0, lng: 0, visited: '2026' },
+	];
+
+	const mapWidth = 1000;
+	const mapHeight = 520;
+
+	function projectToMap(lat, lng) {
+		return {
+			x: ((lng + 180) / 360) * mapWidth,
+			y: ((90 - lat) / 180) * mapHeight,
+		};
+	}
+
+	function createSvgElement(name, attributes = {}) {
+		const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+		Object.entries(attributes).forEach(([key, value]) => el.setAttribute(key, value));
+		return el;
+	}
+
+	function formatSiteLabel(site) {
+		const place = site.country ? `${site.name}, ${site.country}` : site.name;
+		return site.visited ? `${place} (${site.visited})` : place;
+	}
+
+	function renderVisitedSites() {
+		const markerLayer = document.getElementById('heritage-markers');
+		const siteList = document.getElementById('heritage-list');
+		const count = document.getElementById('heritage-count');
+		if (!markerLayer || !siteList || !count) return;
+
+		markerLayer.replaceChildren();
+		siteList.replaceChildren();
+		count.textContent = visitedHeritageSites.length;
+		siteList.hidden = visitedHeritageSites.length === 0;
+
+		visitedHeritageSites.forEach((site, index) => {
+			const { x, y } = projectToMap(site.lat, site.lng);
+			const marker = createSvgElement('g', {
+				class: 'heritage-marker',
+				role: 'listitem',
+				tabindex: '0',
+				'aria-label': formatSiteLabel(site),
+				transform: `translate(${x.toFixed(2)} ${y.toFixed(2)})`,
+			});
+			const title = createSvgElement('title');
+			title.textContent = formatSiteLabel(site);
+			const halo = createSvgElement('circle', { class: 'heritage-marker-halo', r: '10' });
+			const dot = createSvgElement('circle', { class: 'heritage-marker-dot', r: '5' });
+			marker.append(title, halo, dot);
+			markerLayer.append(marker);
+
+			const item = document.createElement('li');
+			item.textContent = formatSiteLabel(site);
+			siteList.append(item);
+		});
+	}
+
+	function toggleTravelMap() {
+		const toggle = document.getElementById('travel-toggle');
+		const panel = document.getElementById('travel-map-panel');
+		if (!toggle || !panel) return;
+
+		const shouldOpen = panel.hidden;
+		panel.hidden = !shouldOpen;
+		toggle.setAttribute('aria-expanded', String(shouldOpen));
+		if (shouldOpen) renderVisitedSites();
+	}
+
+	document.getElementById('travel-toggle')?.addEventListener('click', toggleTravelMap);
+
 	function positionNote(note, trigger) {
 		const margin = 16;
 		const gap = 12;
@@ -157,6 +272,137 @@ import Layout from '../layouts/Layout.astro';
 	.tagline {
 		font-size: 1.125rem;
 		margin-top: 0.5rem;
+	}
+
+	.link-boxes {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-top: 1.25rem;
+	}
+
+	.link-box {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 6rem;
+		padding: 0.55rem 0.9rem;
+		font: inherit;
+		border: 1px solid rgba(28, 25, 23, 0.22);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.28);
+		color: #1c1917;
+		cursor: pointer;
+		text-decoration: none;
+		box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset;
+		transition:
+			background-color 160ms ease,
+			border-color 160ms ease,
+			color 160ms ease;
+	}
+
+	.link-box:hover,
+	.link-box:focus-visible,
+	.link-box[aria-expanded="true"] {
+		background: rgba(255, 255, 255, 0.42);
+		border-color: #228b22;
+		color: #228b22;
+	}
+
+	.travel-map-panel {
+		margin-top: 0.75rem;
+		width: min(100%, 46rem);
+	}
+
+	.travel-map-card {
+		padding: 0.85rem;
+		border: 1px solid rgba(28, 25, 23, 0.22);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.28);
+		box-shadow:
+			0 1px 0 rgba(255, 255, 255, 0.35) inset,
+			0 0.75rem 1.5rem rgba(28, 25, 23, 0.08);
+	}
+
+	.travel-map-header {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 0.65rem;
+	}
+
+	.travel-map-label,
+	.travel-map-count {
+		margin: 0;
+	}
+
+	.travel-map-label {
+		font-weight: 700;
+	}
+
+	.travel-map-count {
+		color: rgba(28, 25, 23, 0.72);
+	}
+
+	.world-map-frame {
+		overflow: hidden;
+		border: 1px solid rgba(28, 25, 23, 0.18);
+		border-radius: 8px;
+		background: #eef7f1;
+	}
+
+	.world-map {
+		display: block;
+		width: 100%;
+		height: auto;
+		aspect-ratio: 1000 / 520;
+	}
+
+	.map-ocean {
+		fill: #eef7f1;
+	}
+
+	.map-grid path {
+		fill: none;
+		stroke: rgba(34, 139, 34, 0.14);
+		stroke-width: 1;
+	}
+
+	.map-land path,
+	.map-land ellipse {
+		fill: #d8d2b8;
+		stroke: rgba(28, 25, 23, 0.2);
+		stroke-width: 1.5;
+	}
+
+	.heritage-marker {
+		color: #228b22;
+		outline: none;
+		cursor: pointer;
+	}
+
+	.heritage-marker-halo {
+		fill: currentColor;
+		opacity: 0.2;
+	}
+
+	.heritage-marker-dot {
+		fill: currentColor;
+		stroke: #fffdf2;
+		stroke-width: 2;
+	}
+
+	.heritage-marker:hover,
+	.heritage-marker:focus-visible {
+		color: #176117;
+	}
+
+	.heritage-list {
+		display: grid;
+		gap: 0.25rem;
+		margin: 0.75rem 0 0;
+		padding-left: 1.2rem;
 	}
 
 	.expand-trigger {
